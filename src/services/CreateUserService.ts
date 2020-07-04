@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { hash } from 'bcryptjs';
-import User from '../models/Users';
+import UserAccess from '../models/UserAccess';
+import UserInfo from '../models/UserInfo';
 import AppError from '../errors/AppError';
 
 /**
@@ -23,9 +24,11 @@ class CreateUserService {
    * @param   Request interface to request run
    * @returns Promise<User> created user
    */
-  public async run({ name, email, password }: Request): Promise<User> {
-    const usersRepository = getRepository(User);
-    const checkUser = await usersRepository.findOne({
+  public async run({ name, email, password }: Request): Promise<UserAccess> {
+    const usersAccessRepository = getRepository(UserAccess);
+    const usersInfoRepository = getRepository(UserInfo);
+
+    const checkUser = await usersAccessRepository.findOne({
       where: { email },
     });
 
@@ -34,12 +37,19 @@ class CreateUserService {
     }
     const hashedPassword = await hash(password, 8);
 
-    const user = usersRepository.create({
-      name,
+    const user = usersAccessRepository.create({
       email,
       password: hashedPassword,
     });
-    await usersRepository.save(user);
+
+    await usersAccessRepository.save(user);
+
+    const info = usersInfoRepository.create({
+      userAccessId: user.userId,
+      firstName: name,
+    });
+
+    await usersInfoRepository.save(info);
 
     return user;
   }

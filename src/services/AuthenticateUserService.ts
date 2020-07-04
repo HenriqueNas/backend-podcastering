@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
-import User from '../models/Users';
+import User from '../models/UserAccess';
 import authConfig from '../config/auth';
 import AppError from '../errors/AppError';
 
@@ -34,7 +34,7 @@ class AuthenticateUserService {
     const { secret, expiresIn } = authConfig.jwt;
 
     const token = sign({}, secret, {
-      subject: user.id,
+      subject: user.userId,
       expiresIn,
     });
 

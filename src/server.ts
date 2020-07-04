@@ -34,5 +34,5 @@ routes.use(
 );
 
 app.listen(3333, () => {
-  console.log('\\o/ Server Running');
+  console.log('🚀 Server Running');
 });
